@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart'; // Import GoogleFonts
 import '../../../core/helpers/routes/app_route_path.dart';
 import '../../../core/utils/config/styles/colors.dart';
 
@@ -46,7 +47,10 @@ class _DashboardHomeState extends State<DashboardHome> {
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
-      title: const Text("Modern Dashboard"),
+      title: Text(
+        "Modern Dashboard",
+        style: GoogleFonts.roboto(color: AppColor.appMainColor), // Apply Roboto font
+      ),
       backgroundColor: AppColor.appMainColor,
       actions: [
         IconButton(
@@ -64,11 +68,11 @@ class _DashboardHomeState extends State<DashboardHome> {
       color: AppColor.appMainColor,
       padding: const EdgeInsets.only(left: 40),
       child: Row(
-        children: const [
+        children: [
           Text(
             'Super Admin',
-            style: TextStyle(
-              color: Colors.yellow,
+            style: GoogleFonts.roboto(
+              color: AppColor.cardColor,
               fontSize: 30,
               fontWeight: FontWeight.bold,
             ),
@@ -80,83 +84,88 @@ class _DashboardHomeState extends State<DashboardHome> {
 
   Widget _customDrawer({required BuildContext ctx}) {
     return Container(
-      color: AppColor.appMainColor.withOpacity(0.95),
-      padding: EdgeInsets.symmetric(horizontal: 10),
+      color: AppColor.appMainColor,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       width: 250,
-      child: ListView(
-        padding: const EdgeInsets.symmetric(vertical: 20),
-        children: [
-          _buildDrawerItem(
-            icon: Icons.person,
-            label: 'Profile',
-            onTap: () => ctx.go(RoutesPath.profile),
-          ),
-          _buildDrawerItem(
-            icon: Icons.dashboard,
-            label: 'Dashboard',
-            onTap: () => ctx.go(RoutesPath.dashboard),
-          ),
-          _buildDrawerItem(
-            icon: Icons.lock,
-            label: 'Role Access',
-            onTap: () => ctx.go(RoutesPath.roleAccess),
-          ),
-          _buildDrawerItem(
-            icon: Icons.local_hospital_outlined,
-            label: 'Hospitals',
-            onTap: () => ctx.go(RoutesPath.hospitals),
-          ),
-          _buildDrawerItem(
-            icon: Icons.credit_card_outlined,
-            label: 'Users',
-            onTap: () => ctx.go(RoutesPath.users),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 4.0),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: Colors.white.withOpacity(0.1),
-              ),
-              padding: const EdgeInsets.symmetric( horizontal: 12), // Match padding
-              child: Theme(
-                data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                child: ExpansionTile(
-                  collapsedIconColor: Colors.white,
-                  leading: const Icon(Icons.credit_card_outlined, color: Colors.white),
-                  title: const Text('Reports', style: TextStyle(color: Colors.white)),
-                  iconColor: Colors.white,
-                  tilePadding: const EdgeInsets.all(0), // Remove default padding
-                  childrenPadding: const EdgeInsets.all(0), // Remove default padding
-                  backgroundColor: Colors.transparent,
-                  children: [
-                    _buildDrawerItem(
-                      icon: Icons.file_copy,
-                      label: 'File Reports',
-                      onTap: () => ctx.go(RoutesPath.fileReports),
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ListView(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          children: [
+            _buildDrawerItem(
+              icon: Icons.person,
+              label: 'Profile',
+              onTap: () => ctx.go(RoutesPath.profile),
+            ),
+            _buildDrawerItem(
+              icon: Icons.dashboard,
+              label: 'Dashboard',
+              onTap: () => ctx.go(RoutesPath.dashboard),
+            ),
+            _buildDrawerItem(
+              icon: Icons.lock,
+              label: 'Role Access',
+              onTap: () => ctx.go(RoutesPath.roleAccess),
+            ),
+            _buildDrawerItem(
+              icon: Icons.local_hospital_outlined,
+              label: 'Hospitals',
+              onTap: () => ctx.go(RoutesPath.hospitals),
+            ),
+            _buildDrawerItem(
+              icon: Icons.credit_card_outlined,
+              label: 'Users',
+              onTap: () => ctx.go(RoutesPath.users),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.white.withOpacity(0.1),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Theme(
+                  data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                  child: ExpansionTile(
+                    collapsedIconColor: Colors.white,
+                    leading: const Icon(Icons.credit_card_outlined, color: Colors.white),
+                    title: Text(
+                      'Reports',
+                      style: GoogleFonts.roboto(color: Colors.white,fontSize: 14),
                     ),
-                    _buildDrawerItem(
-                      icon: Icons.person_outline,
-                      label: 'User Reports',
-                      onTap: () => ctx.go(RoutesPath.fullReport),
-                    ),
-                  ],
+                    iconColor: Colors.white,
+                    tilePadding: const EdgeInsets.all(0),
+                    childrenPadding: const EdgeInsets.all(0),
+                    backgroundColor: Colors.transparent,
+                    children: [
+                      _buildDrawerItem(
+                        icon: Icons.file_copy,
+                        label: 'File Reports',
+                        onTap: () => ctx.go(RoutesPath.fileReports),
+                      ),
+                      _buildDrawerItem(
+                        icon: Icons.person_outline,
+                        label: 'User Reports',
+                        onTap: () => ctx.go(RoutesPath.fullReport),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          _buildDrawerItem(
-            icon: Icons.logout,
-            label: 'Logout',
-            onTap: () {
-              // Add logout logic here
-            },
-          ),
-        ],
+            _buildDrawerItem(
+              icon: Icons.logout,
+              label: 'Logout',
+              onTap: () {
+                // Add logout logic here
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
-
 
   Widget _buildDrawerItem({
     required IconData icon,
@@ -181,9 +190,9 @@ class _DashboardHomeState extends State<DashboardHome> {
               Expanded(
                 child: Text(
                   label,
-                  style: const TextStyle(
+                  style: GoogleFonts.roboto(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
