@@ -1,3 +1,4 @@
+import 'package:appolo/features/users/controller/post_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -19,6 +20,9 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(
           create: (context) => DashboardController(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => PostController(),
         ),
 
       ],

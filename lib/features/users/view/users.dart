@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 import '../../../core/utils/config/styles/colors.dart';
+import '../controller/post_controller.dart';
+import '../model/post_model.dart';
 
 class Users extends StatefulWidget {
   const Users({super.key});
@@ -10,19 +13,18 @@ class Users extends StatefulWidget {
 }
 
 class _UsersState extends State<Users> {
-  final List<Map<String, dynamic>> users = List.generate(5, (index) {
-    return {
-      'slNo': index + 1,
-      'userId': 'UID00${index + 1}',
-      'name': 'User ${index + 1}',
-      'department': 'Department ${index + 1}',
-      'isActive': index % 2 == 0,
-    };
-  });
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<PostController>(context, listen: false).postApi();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     var w = MediaQuery.of(context).size.width;
+    final postController = Provider.of<PostController>(context);
 
     return Scaffold(
       body: Container(
@@ -57,10 +59,12 @@ class _UsersState extends State<Users> {
                 _buildTableHeaders(),
                 const Divider(),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: users.length,
+                  child: postController.postList.isEmpty
+                      ? _buildShimmerList()
+                      : ListView.builder(
+                    itemCount: postController.postList.length,
                     itemBuilder: (context, index) {
-                      return _buildTableRow(users[index], index % 2 == 0);
+                      return _buildTableRow(postController.postList[index], index % 2 == 0);
                     },
                   ),
                 ),
@@ -69,6 +73,39 @@ class _UsersState extends State<Users> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildShimmerList() {
+    return ListView.builder(
+      itemCount: 5,
+      itemBuilder: (context, index) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey.shade300,
+          highlightColor: Colors.grey.shade100,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(flex: 1, child: _shimmerBox()),
+                Expanded(flex: 2, child: _shimmerBox()),
+                Expanded(flex: 3, child: _shimmerBox()),
+                Expanded(flex: 3, child: _shimmerBox()),
+                Expanded(flex: 2, child: _shimmerBox()),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _shimmerBox() {
+    return Container(
+      height: 20,
+      color: Colors.white,
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
     );
   }
 
@@ -89,44 +126,61 @@ class _UsersState extends State<Users> {
   }
 
   Widget _buildTableHeaders() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: const [
-        Expanded(flex: 1, child: Text('Sl No', style: _headerTextStyle)),
-        Expanded(flex: 2, child: Text('User ID', style: _headerTextStyle)),
-        Expanded(flex: 3, child: Text('Name', style: _headerTextStyle)),
-        Expanded(flex: 3, child: Text('Department', style: _headerTextStyle)),
-        Expanded(flex: 2, child: Text('Action', style: _headerTextStyle)),
-      ],
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+      decoration: BoxDecoration(
+        color: AppColor.appMainColor,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: const [
+          Expanded(flex: 1, child: Text('Sl No', style: _headerTextStyle)),
+          Expanded(flex: 2, child: Text('User Id', style: _headerTextStyle)),
+          Expanded(flex: 3, child: Text('Title', style: _headerTextStyle)),
+          Expanded(flex: 3, child: Text('Content', style: _headerTextStyle)),
+          Expanded(flex: 2, child: Text('Action', style: _headerTextStyle)),
+        ],
+      ),
     );
   }
 
-  Widget _buildTableRow(Map<String, dynamic> user, bool isEvenRow) {
+  Widget _buildTableRow(PostModel user, bool isEvenRow) {
     return Container(
-      color: isEvenRow ? Colors.grey.withOpacity(0.1) : Colors.white,
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+      decoration: BoxDecoration(
+        color: isEvenRow ? Colors.grey.shade100 : Colors.white,
+        border: Border(
+          bottom: BorderSide(color: Colors.grey.shade300),
+        ),
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(flex: 1, child: _styledCell('${user['slNo']}')),
-          Expanded(flex: 2, child: _styledCell(user['userId'])),
-          Expanded(flex: 3, child: _styledCell(user['name'])),
-          Expanded(flex: 3, child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: _departmentCell(user['department'], user['isActive']),
-          )),
+          Expanded(flex: 1, child: _styledCell('${user.id ?? ''}', TextAlign.center)),
+          Expanded(flex: 2, child: _styledCell(user.userId.toString() ?? '', TextAlign.center)),
+          Expanded(flex: 3, child: _styledCell(user.title ?? "N/A", TextAlign.left)),
+          Expanded(
+            flex: 3,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: _departmentCell(user.body ?? "N/A", true),
+            ),
+          ),
           Expanded(flex: 2, child: _buildActionButtons()),
         ],
       ),
     );
   }
 
-  Widget _styledCell(String text) {
+  Widget _styledCell(String text, TextAlign textAlign) {
     return Text(
       text,
+      textAlign: textAlign,
       style: const TextStyle(
         color: Colors.black87,
         fontWeight: FontWeight.w500,
+        fontSize: 14,
       ),
     );
   }
@@ -137,12 +191,14 @@ class _UsersState extends State<Users> {
         Expanded(
           child: Text(
             department,
-            style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
+            style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w500, fontSize: 14),
           ),
         ),
         ElevatedButton(
           onPressed: () {
-            setState(() => isActive = !isActive);
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Provider.of<PostController>(context, listen: false).toggleActive();
+            });
           },
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -190,5 +246,5 @@ class _UsersState extends State<Users> {
 const TextStyle _headerTextStyle = TextStyle(
   fontWeight: FontWeight.bold,
   fontSize: 16,
-  color: Colors.black87,
+  color: Colors.white,
 );
