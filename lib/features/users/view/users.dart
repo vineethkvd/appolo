@@ -13,23 +13,34 @@ class Users extends StatefulWidget {
 }
 
 class _UsersState extends State<Users> {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<PostController>(context, listen: false).postApi();
+      Provider.of<PostController>(context, listen: false).fetchPosts();
+    });
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+        Provider.of<PostController>(context, listen: false).nextPage();
+      }
     });
   }
 
   @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    var w = MediaQuery.of(context).size.width;
     final postController = Provider.of<PostController>(context);
 
     return Scaffold(
       body: Container(
-        width: w,
-        color: AppColor.primaryColor,
         padding: const EdgeInsets.all(15),
         child: Card(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
@@ -59,11 +70,15 @@ class _UsersState extends State<Users> {
                 _buildTableHeaders(),
                 const Divider(),
                 Expanded(
-                  child: postController.postList.isEmpty
+                  child: postController.isLoading && postController.postList.isEmpty
                       ? _buildShimmerList()
                       : ListView.builder(
-                    itemCount: postController.postList.length,
+                    controller: _scrollController,
+                    itemCount: postController.postList.length + (postController.isLoading ? 1 : 0),
                     itemBuilder: (context, index) {
+                      if (index == postController.postList.length) {
+                        return Center(child: CircularProgressIndicator());
+                      }
                       return _buildTableRow(postController.postList[index], index % 2 == 0);
                     },
                   ),
@@ -84,28 +99,12 @@ class _UsersState extends State<Users> {
           baseColor: Colors.grey.shade300,
           highlightColor: Colors.grey.shade100,
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(flex: 1, child: _shimmerBox()),
-                Expanded(flex: 2, child: _shimmerBox()),
-                Expanded(flex: 3, child: _shimmerBox()),
-                Expanded(flex: 3, child: _shimmerBox()),
-                Expanded(flex: 2, child: _shimmerBox()),
-              ],
-            ),
+            height: 20,
+            color: Colors.white,
+            margin: const EdgeInsets.symmetric(vertical: 4),
           ),
         );
       },
-    );
-  }
-
-  Widget _shimmerBox() {
-    return Container(
-      height: 20,
-      color: Colors.white,
-      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
     );
   }
 
@@ -196,9 +195,7 @@ class _UsersState extends State<Users> {
         ),
         ElevatedButton(
           onPressed: () {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              Provider.of<PostController>(context, listen: false).toggleActive();
-            });
+            // Implement toggle active logic here
           },
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

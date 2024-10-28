@@ -5,31 +5,24 @@ import '../../../core/utils/shared/component/widgets/custom_toast.dart';
 import '../model/post_model.dart';
 import '../repository/post_repository.dart';
 
-class PostController extends ChangeNotifier{
+class PostController extends ChangeNotifier {
   final _api = UserRepository();
   bool isLoading = false;
-bool isActive=false;
-  void toggleActive() {
-    isActive = !isActive;
-    notifyListeners();
-  }
-  //post api
+  bool isActive = false;
+  int currentPage = 1;
+  final int limit = 10;
+
   var postModel = PostModel();
   var postList = <PostModel>[];
-  var selectedStateId = '';
-  var selectedStateName = '';
-  Future<void> postApi() async {
+
+  Future<void> fetchPosts() async {
     try {
       isLoading = true;
       notifyListeners();
-      final response = await _api.postApi();
+      final response = await _api.postApi(currentPage, limit);
       if (response != null && response['status'] == 200) {
         final List<dynamic> responseData = response['data'];
-        postList =
-            responseData.map((json) => PostModel.fromJson(json)).toList();
-        notifyListeners();
-      } else if (response != null && response['status'] == 400) {
-        postModel = PostModel.fromJson(response['data']);
+        postList.addAll(responseData.map((json) => PostModel.fromJson(json)).toList());
         notifyListeners();
       } else {
         CustomToast.showCustomToast(message: "Unexpected error occurred");
@@ -45,5 +38,14 @@ bool isActive=false;
     }
   }
 
+  void nextPage() {
+    currentPage++;
+    fetchPosts();
+  }
 
+  void resetPagination() {
+    currentPage = 1;
+    postList.clear();
+    fetchPosts();
+  }
 }

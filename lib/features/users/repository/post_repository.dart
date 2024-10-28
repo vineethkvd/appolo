@@ -6,8 +6,9 @@ import '../../../core/helpers/network/network_api_services.dart';
 class UserRepository {
   final _apiService = NetworkApiServices();
 
-  Future<dynamic> postApi() async {
-    dynamic response = await _apiService.getApi(ApiEndPoints.posts);
+  Future<dynamic> postApi(int page, int limit) async {
+    final String url = '${ApiEndPoints.posts}?_page=$page&_limit=$limit';
+    dynamic response = await _apiService.getApi(url);
     return response;
   }
 }
