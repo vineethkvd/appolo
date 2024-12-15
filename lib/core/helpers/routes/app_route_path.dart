@@ -6,4 +6,5 @@ class RoutesPath {
   static const String users = '/dashboard/users';
   static const String fullReport = '/dashboard/reports/fullReport';
   static const String fileReports = '/dashboard/reports/fileReports';
+  static const String addUser = '/dashboard/users/adduser';
 }

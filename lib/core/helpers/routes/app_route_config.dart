@@ -9,6 +9,8 @@ import 'package:go_router/go_router.dart';
 import '../../../features/dashboard/view/dashboard.dart';
 import '../../../features/home/view/dashboard_home.dart';
 import '../../../features/role_access/view/role_access.dart';
+import '../../../features/users/controller/add_user_controller.dart';
+import '../../../features/users/view/add_user.dart';
 import 'app_route_name.dart';
 import 'app_route_path.dart';
 
@@ -94,6 +96,17 @@ class AppRoutes {
             pageBuilder: (context, state) => CustomTransitionPage<void>(
               key: state.pageKey,
               child: const FileReports(),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) =>
+                  FadeTransition(opacity: animation, child: child),
+            ),
+          ),
+          GoRoute(
+            name: RoutesName.addUser,
+            path: RoutesPath.addUser,
+            pageBuilder: (context, state) => CustomTransitionPage<void>(
+              key: state.pageKey,
+              child: const AddUser(),
               transitionsBuilder:
                   (context, animation, secondaryAnimation, child) =>
                   FadeTransition(opacity: animation, child: child),

@@ -6,4 +6,5 @@ class RoutesName {
   static const String users = 'users';
   static const String fullReport = 'fullReport';
   static const String fileReports = 'fileReports';
+  static const String addUser = 'adduser';
 }

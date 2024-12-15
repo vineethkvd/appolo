@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+import '../../../core/helpers/routes/app_route_path.dart';
 import '../../../core/utils/config/styles/colors.dart';
 import '../controller/post_controller.dart';
 import '../model/post_model.dart';
@@ -23,7 +25,8 @@ class _UsersState extends State<Users> {
     });
 
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels == _scrollController.position.maxScrollExtent) {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {
         Provider.of<PostController>(context, listen: false).nextPage();
       }
     });
@@ -43,7 +46,8 @@ class _UsersState extends State<Users> {
       body: Container(
         padding: const EdgeInsets.all(15),
         child: Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
           color: Colors.white,
           elevation: 5,
           child: Padding(
@@ -59,9 +63,13 @@ class _UsersState extends State<Users> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    _buildTopButton("Add User", Icons.person_add, Colors.blue, () {}),
+                    _buildTopButton("Add User", Icons.person_add, Colors.blue,
+                        () {
+                      context.go(RoutesPath.addUser);
+                    }),
                     const SizedBox(width: 10),
-                    _buildTopButton("Download", Icons.download, Colors.green, () {}),
+                    _buildTopButton(
+                        "Download", Icons.download, Colors.green, () {}),
                     const SizedBox(width: 10),
                     _buildTopButton("Print", Icons.print, Colors.orange, () {}),
                   ],
@@ -70,18 +78,21 @@ class _UsersState extends State<Users> {
                 _buildTableHeaders(),
                 const Divider(),
                 Expanded(
-                  child: postController.isLoading && postController.postList.isEmpty
+                  child: postController.isLoading &&
+                          postController.postList.isEmpty
                       ? _buildShimmerList()
                       : ListView.builder(
-                    controller: _scrollController,
-                    itemCount: postController.postList.length + (postController.isLoading ? 1 : 0),
-                    itemBuilder: (context, index) {
-                      if (index == postController.postList.length) {
-                        return Center(child: CircularProgressIndicator());
-                      }
-                      return _buildTableRow(postController.postList[index], index % 2 == 0);
-                    },
-                  ),
+                          controller: _scrollController,
+                          itemCount: postController.postList.length +
+                              (postController.isLoading ? 1 : 0),
+                          itemBuilder: (context, index) {
+                            if (index == postController.postList.length) {
+                              return Center(child: CircularProgressIndicator());
+                            }
+                            return _buildTableRow(
+                                postController.postList[index], index % 2 == 0);
+                          },
+                        ),
                 ),
               ],
             ),
@@ -108,7 +119,8 @@ class _UsersState extends State<Users> {
     );
   }
 
-  Widget _buildTopButton(String label, IconData icon, Color color, VoidCallback onPressed) {
+  Widget _buildTopButton(
+      String label, IconData icon, Color color, VoidCallback onPressed) {
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: Icon(icon, color: Colors.white, size: 16),
@@ -156,9 +168,15 @@ class _UsersState extends State<Users> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Expanded(flex: 1, child: _styledCell('${user.id ?? ''}', TextAlign.center)),
-          Expanded(flex: 2, child: _styledCell(user.userId.toString() ?? '', TextAlign.center)),
-          Expanded(flex: 3, child: _styledCell(user.title ?? "N/A", TextAlign.left)),
+          Expanded(
+              flex: 1,
+              child: _styledCell('${user.id ?? ''}', TextAlign.center)),
+          Expanded(
+              flex: 2,
+              child:
+                  _styledCell(user.userId.toString() ?? '', TextAlign.center)),
+          Expanded(
+              flex: 3, child: _styledCell(user.title ?? "N/A", TextAlign.left)),
           Expanded(
             flex: 3,
             child: Padding(
@@ -190,7 +208,10 @@ class _UsersState extends State<Users> {
         Expanded(
           child: Text(
             department,
-            style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w500, fontSize: 14),
+            style: const TextStyle(
+                color: Colors.black87,
+                fontWeight: FontWeight.w500,
+                fontSize: 14),
           ),
         ),
         ElevatedButton(
@@ -200,7 +221,8 @@ class _UsersState extends State<Users> {
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             backgroundColor: isActive ? Colors.green : Colors.red,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
           child: Text(
             isActive ? 'Deactivate' : 'Activate',

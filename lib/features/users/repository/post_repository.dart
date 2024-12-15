@@ -11,4 +11,10 @@ class UserRepository {
     dynamic response = await _apiService.getApi(url);
     return response;
   }
+
+  Future<dynamic> dataApi(int page, int limit) async {
+    const String url = ApiEndPoints.posts;
+    dynamic response = await _apiService.getApi(url);
+    return response;
+  }
 }
